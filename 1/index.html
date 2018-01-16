@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+    <head>
+        <title>WebGL practice one</title>
+        <meta charset='utf-8' />
+    </head>
+    <body>
+        <canvas id='canvas'></canvas>
+        <script type='x-shader/x-vertext' id='vs'>
+            attribute vec3 position;
+
+            void main() {
+                gl_Position = vec4(position, 1.0);
+                gl_PointSize = 10.0;
+            }
+        </script>
+        <script type='x-shader/x-fragment' id='fs'>
+            precision mediump float;
+
+            void main() {
+                gl_FragColor = vec4(1.0, 0, 0, 1.0);
+            }
+        </script>
+        <script src='./index.js'></script>
+    </body>
+</html>
