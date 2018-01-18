@@ -151,7 +151,7 @@ function bindClickEvent (ele, a_Position, pos_buffer, size_buffer) {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW)
 
         gl.clear(gl.COLOR_BUFFER_BIT)
-        gl.drawArrays(gl.POINTS, 0, points.length / 3)
+        gl.drawArrays(gl.TRIANGLES, 0, points.length / 3)
     })
 }
 
