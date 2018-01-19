@@ -26,17 +26,55 @@ function main (id) {
         size: 3,
         type: gl.FLOAT
     })
-    const a_PointSize = gl.getAttribLocation(program, 'a_PointSize')
-    gl.vertexAttrib1f(a_PointSize, 20.0)
 
-    // const { location: a_PointSize, buffer: size_buffer } = initAttribute({
-    //     program,
-    //     attribute: 'a_PointSize',
-    //     size: 1,
-    //     type: gl.FLOAT
-    // })
+    const u_matrix = gl.getUniformLocation(program, 'u_matrix')
 
-    bindClickEvent(canvas, a_Position, pos_buffer)
+    // 平移
+    const tX = .5
+    const tY = -.3
+    // gl.uniformMatrix4fv(u_matrix, false, [
+    //     1, 0, 0, tX,
+    //     0, 1, 0, tY,
+    //     0, 0, 0, 0,
+    //     0, 0, 0, 1
+    // ])
+
+    // 旋转
+    const deg = 30
+    const r = 30 * Math.PI / 180
+    const cosR = Math.cos(r)
+    const sinR = Math.sin(r)
+    // gl.uniformMatrix4fv(u_matrix, false, [
+    //     cosR, -sinR, 0, 0,
+    //     sinR, cosR, 0, 0,
+    //     0, 0, 0, 0,
+    //     0, 0, 0, 1
+    // ])
+
+    // 缩放
+    const sizeX = sizeY = .5
+    // gl.uniformMatrix4fv(u_matrix, false, [
+    //     sizeX, 0, 0, 0,
+    //     0, sizeY, 0, 0,
+    //     0, 0, 0, 0,
+    //     0, 0, 0, 1
+    // ])
+
+    // T * R
+    gl.uniformMatrix4fv(u_matrix, false, [
+        cosR, -sinR, 0, tX,
+        sinR, cosR, 0, tY,
+        0, 0, 0, 0,
+        0, 0, 0, 1
+    ])    
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -.5, 0, 0,
+        0, 0, 0,
+        0, .5, 0
+    ]), gl.STATIC_DRAW)
+
+    gl.drawArrays(gl.TRIANGLES, 0, 3)
     gl.flush()
 }
 

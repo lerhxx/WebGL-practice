@@ -8,13 +8,13 @@
         <canvas id='canvas'></canvas>
         <script type='x-shader/x-vertext' id='vs'>
             attribute vec4 a_Position;
-            attribute float a_PointSize;
+            
+            uniform mat4 u_matrix;
 
             varying vec4 v_color;
 
             void main() {
-                gl_Position = a_Position;
-                gl_PointSize = a_PointSize;
+                gl_Position = a_Position * u_matrix;
                 v_color = gl_Position * 0.5 + 0.5;
             }
         </script>
