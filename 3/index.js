@@ -20,41 +20,27 @@ function main (id) {
 
     const program = createProgram('vs', 'fs')
 
-    // const { location: a_Position, buffer: pos_buffer } = initAttribute({
-    //     program,
-    //     attribute: 'a_Position',
-    //     size: 3,
-    //     type: gl.FLOAT
-    // })
+    const vertexSizes = new Float32Array([
+        -.5, -.3, 10,
+        .5, .3, 15,
+        .5, -.5, 20
+    ])
 
-    // const { location: a_PointSize, buffer: size_buffer } = initAttribute({
-    //     program,
-    //     attribute: 'a_Position',
-    //     size: 1,
-    //     type: gl.FLOAT
-    // })
+    const FSIZE = vertexSizes.BYTES_PER_ELEMENT
 
-    // bindClickEvent(canvas, a_Position, pos_buffer)
-
-    const a_Position = gl.getAttribLocation(program, 'a_Position')
     const pos_buffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, pos_buffer)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        -.5, -.3, 0,
-        .5, .3, 0,
-        .5, -.5, 0
-    ]), gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, vertexSizes, gl.STATIC_DRAW)
+
+    const a_Position = gl.getAttribLocation(program, 'a_Position')
     gl.enableVertexAttribArray(a_Position)
-    gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0)
+    gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, FSIZE * 3, 0)
 
     const a_PointSize = gl.getAttribLocation(program, 'a_PointSize')
-    const size_buffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, size_buffer)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([15.0, 15.0, 10.0]), gl.STATIC_DRAW)
     gl.enableVertexAttribArray(a_PointSize)
-    gl.vertexAttribPointer(a_PointSize, 1, gl.FLOAT, false, 0, 0)
+    gl.vertexAttribPointer(a_PointSize, 1, gl.FLOAT, false, FSIZE * 3, FSIZE * 2)
 
-    gl.drawArrays(gl.POINTS, 0, 3)
+    gl.drawArrays(gl.TRIANGLES, 0, 3)
     // gl.flush()
 }
 
