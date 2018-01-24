@@ -21,9 +21,10 @@ function main (id) {
     const program = createProgram('vs', 'fs')
 
     const vertexSizes = new Float32Array([
-        -.5, -.3, 10,
-        .5, .3, 15,
-        .5, -.5, 20
+        -1, 1, 0, 1,
+        -1, -1, 0, 0,
+        1, 1, 1, 1,
+        1, -1, 1, 0
     ])
 
     const FSIZE = vertexSizes.BYTES_PER_ELEMENT
@@ -34,14 +35,19 @@ function main (id) {
 
     const a_Position = gl.getAttribLocation(program, 'a_Position')
     gl.enableVertexAttribArray(a_Position)
-    gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, FSIZE * 3, 0)
+    gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, FSIZE * 4, 0)
 
-    const a_PointSize = gl.getAttribLocation(program, 'a_PointSize')
-    gl.enableVertexAttribArray(a_PointSize)
-    gl.vertexAttribPointer(a_PointSize, 1, gl.FLOAT, false, FSIZE * 3, FSIZE * 2)
+    const a_TexCoord = gl.getAttribLocation(program, 'a_TexCoord')
+    gl.enableVertexAttribArray(a_TexCoord)
+    gl.vertexAttribPointer(a_TexCoord, 2, gl.FLOAT, false, FSIZE * 4, FSIZE * 2)
 
-    gl.drawArrays(gl.TRIANGLES, 0, 3)
-    // gl.flush()
+    const texture = gl.createTexture()
+    const u_Sampler = gl.getUniformLocation(program, 'u_Sampler')
+    const img = new Image()
+    img.onload = () => {
+        loadTexture(texture, u_Sampler, img)
+    }
+    img.src='./1.jpg'
 }
 
 function getWebGLContext (canavs) {
@@ -133,32 +139,15 @@ function initAttribute ({
     }
 }
 
-function bindClickEvent (ele, a_Position, pos_buffer) {
-    const rect = ele.getBoundingClientRect()
-    const hw = rect.width / 2
-    const hh = rect.height / 2
+function loadTexture (texture, u_Sampler, img) {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
+    gl.activeTexture(gl.TEXTURE0)
+    gl.bindTexture(gl.TEXTURE_2D, texture)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img)
 
-    const points = []
-    const sizes = []
-
-    ele.addEventListener('mousedown', e => {
-        const x = e.clientX
-        const y = e.clientY
-        
-        const rx = (x - rect.left - hw) / hw
-        const ry = (hh -y - rect.top) / hh
-        
-        points.push(rx)
-        points.push(ry)
-        points.push(0)
-        sizes.push(random(10, 30))
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER, pos_buffer)
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW)
-
-        gl.clear(gl.COLOR_BUFFER_BIT)
-        gl.drawArrays(gl.POINTS, 0, points.length / 3)
-    })
+    gl.uniform1i(u_Sampler, 0)
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 }
 
 function random (min = 0, max = 1) {

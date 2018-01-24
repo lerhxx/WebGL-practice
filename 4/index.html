@@ -8,24 +8,24 @@
         <canvas id='canvas'></canvas>
         <script type='x-shader/x-vertext' id='vs'>
             attribute vec4 a_Position;
-            attribute float a_PointSize;
-            
+            attribute vec2 a_TexCoord;
 
-            varying vec4 v_color;
+            varying vec2 v_TexCoord;
 
             void main() {
                 gl_Position = a_Position;
-                gl_PointSize = a_PointSize;
-                v_color = gl_Position * 0.5 + 0.5;
+                v_TexCoord = a_TexCoord;
             }
         </script>
         <script type='x-shader/x-fragment' id='fs'>
             precision mediump float;
 
-            varying vec4 v_color;
+            uniform sampler2D u_Sampler;
+
+            varying vec2 v_TexCoord;
 
             void main() {
-                gl_FragColor = v_color;
+                gl_FragColor = texture2D(u_Sampler, v_TexCoord).rgba;
             }
         </script>
         <script src='./index.js'></script>
