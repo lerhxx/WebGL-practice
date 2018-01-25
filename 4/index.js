@@ -1,4 +1,6 @@
 ;let gl = null
+let img0Loaded = false
+let img1Loaded = false
 
 window.onload  = () => {
     main('canvas')
@@ -41,13 +43,26 @@ function main (id) {
     gl.enableVertexAttribArray(a_TexCoord)
     gl.vertexAttribPointer(a_TexCoord, 2, gl.FLOAT, false, FSIZE * 4, FSIZE * 2)
 
-    const texture = gl.createTexture()
-    const u_Sampler = gl.getUniformLocation(program, 'u_Sampler')
-    const img = new Image()
-    img.onload = () => {
-        loadTexture(texture, u_Sampler, img)
+    const texture0 = gl.createTexture()
+    const texture1 = gl.createTexture()
+
+    const u_Sampler0 = gl.getUniformLocation(program, 'u_Sampler0')
+    const u_Sampler1 = gl.getUniformLocation(program, 'u_Sampler1')
+    
+    const img0 = new Image()
+    img0.onload = () => {
+        img0Loaded = true
+        loadTexture(texture0, u_Sampler0, img0, 0)
     }
-    img.src='./1.jpg'
+    
+    const img1 = new Image()
+    img1.onload = () => {
+        img1Loaded = true
+        loadTexture(texture1, u_Sampler1, img1, 1)
+    }
+
+    img0.src='./1.png'
+    img1.src='./2.png'
 }
 
 function getWebGLContext (canavs) {
@@ -139,15 +154,15 @@ function initAttribute ({
     }
 }
 
-function loadTexture (texture, u_Sampler, img) {
+function loadTexture (texture, u_Sampler, img, texUnit) {
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
-    gl.activeTexture(gl.TEXTURE0)
+    gl.activeTexture(gl[`TEXTURE${texUnit}`])
     gl.bindTexture(gl.TEXTURE_2D, texture)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img)
 
-    gl.uniform1i(u_Sampler, 0)
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+    gl.uniform1i(u_Sampler, texUnit)
+    img0Loaded && img1Loaded && gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 }
 
 function random (min = 0, max = 1) {
