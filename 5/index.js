@@ -22,45 +22,34 @@ function main (id) {
 
     const program = createProgram('vs', 'fs')
 
-    const vertexSizes = new Float32Array([
-        0, .5, -.4, .4, 1, .4,
-        -.5, -.5, -.4, .4, 1, .4,
-        .5, .5, -.4, 1, .4, .4,
-
-        .5, .4, -.2, 1, .4, .4,
-        -.5, .4, -.2, 1, 1, .4,
-        0, -.6, -.2, 1, 1, .4,
-
-        0, .5, 0, .4, .4, 1,
-        -.5, -.5, 0, .4, .4, 1,
-        .5, -.5, 0, 1, .4, .4
-    ])
-
-    const FSIZE = vertexSizes.BYTES_PER_ELEMENT
-
     const pos_buffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, pos_buffer)
-    gl.bufferData(gl.ARRAY_BUFFER, vertexSizes, gl.STATIC_DRAW)
+
+    const translate = [100, 100]
+    const rotate = [30, 60]
+    const scale = [.9, .8]
+    let width = 100
+    let height = 100
+    
+    // setRectangle(translate[0], translate[1], width, height)
+    setGeometry()
 
     const a_Position = gl.getAttribLocation(program, 'a_Position')
     gl.enableVertexAttribArray(a_Position)
-    gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, FSIZE * 6, 0)
+    gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0)
 
-    const a_Color = gl.getAttribLocation(program, 'a_Color')
-    gl.enableVertexAttribArray(a_Color)
-    gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, FSIZE * 6, FSIZE * 3)
+    const u_Color = gl.getUniformLocation(program, 'u_Color')
+    const u_Matrix = gl.getUniformLocation(program, 'u_Matrix')
 
-    const u_ViewMatrix = gl.getUniformLocation(program, 'u_ViewMatrix')
+    gl.uniform4fv(u_Color, [random(), random(), random(), 1])
 
-    const viewMatrix = new Float32Array([
-        .2, 0, 0, 0,
-        .25, 0, 1, 0,
-        .25, 0, 0, 0,
-        0, 0, 0, 1
-    ])
-    gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix)
+    let matrix = m3.projection(gl.canvas.width, gl.canvas.height)
+    matrix = m3.translate(matrix, translate[0], translate[1])
+    matrix = m3.rotate(matrix, rotate[0], rotate[1])
+    matrix = m3.scale(matrix, scale[0], scale[1])
+    gl.uniformMatrix3fv(u_Matrix, false, matrix)
 
-    gl.drawArrays(gl.TRIANGLES, 0, 9)
+    gl.drawArrays(gl.TRIANGLES, 0, 18)
 }
 
 function getWebGLContext (canavs) {
@@ -165,4 +154,49 @@ function loadTexture (texture, u_Sampler, img, texUnit) {
 
 function random (min = 0, max = 1) {
     return Math.random() * ( max - min ) + min
+}
+
+function setRectangle (x, y, w, h) {
+    let x1 = x + w,
+        y1 = y + h
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        x, y,
+        x1, y,
+        x, y1,
+        x1, y,
+        x1, y1,
+        x, y1,
+    ]), gl.STATIC_DRAW)
+}
+
+function setGeometry () {
+    gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([
+            // left column
+            0, 0,
+            30, 0,
+            0, 150,
+            0, 150,
+            30, 0,
+            30, 150,
+  
+            // top rung
+            30, 0,
+            100, 0,
+            30, 30,
+            30, 30,
+            100, 0,
+            100, 30,
+  
+            // middle rung
+            30, 60,
+            67, 60,
+            30, 90,
+            30, 90,
+            67, 60,
+            67, 90,
+        ]),
+        gl.STATIC_DRAW
+    );
 }

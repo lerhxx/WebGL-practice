@@ -8,29 +8,24 @@
         <canvas id='canvas'></canvas>
         <script type='x-shader/x-vertext' id='vs'>
             attribute vec4 a_Position;
-            attribute vec4 a_Color;
 
-            uniform mat4 u_ViewMatrix;
-
-            varying vec4 v_Color;
+            uniform mat4 u_Matrix;
 
             void main() {
-                gl_Position = u_ViewMatrix * a_Position;
-                v_Color = a_Color;
+
+                gl_Position = vec4((u_Matrix * vec3(a_Position, 1)).xy, 0, 1);
             }
         </script>
         <script type='x-shader/x-fragment' id='fs'>
             precision mediump float;
 
-            uniform sampler2D u_Sampler0;
-            uniform sampler2D u_Sampler1;
-
-            varying vec4 v_Color;
+            uniform vec4 u_Color;
 
             void main() {
-                gl_FragColor = v_Color;
+                gl_FragColor = u_Color;
             }
         </script>
+        <script src='./matrix.js'></script>
         <script src='./index.js'></script>
     </body>
 </html>
