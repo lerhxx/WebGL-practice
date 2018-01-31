@@ -7,13 +7,13 @@
     <body>
         <canvas id='canvas'></canvas>
         <script type='x-shader/x-vertext' id='vs'>
-            attribute vec2 a_Position;
+            attribute vec4 a_Position;
 
-            uniform mat3 u_Matrix;
+            uniform mat4 u_Matrix;
 
             void main() {
 
-                gl_Position = vec4((u_Matrix * vec3(a_Position, 1)).xy, 0, 1);
+                gl_Position = u_Matrix * a_Position;
             }
         </script>
         <script type='x-shader/x-fragment' id='fs'>
