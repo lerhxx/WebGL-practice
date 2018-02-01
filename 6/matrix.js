@@ -97,25 +97,25 @@ window.m4 = {
     },
     translation: function (tx, ty, tz) {
         return [
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
+            1,  0,  0,  0,
+            0,  1,  0,  0,
+            0,  0,  1,  0,
             tx, ty, tz, 1
         ]
     },
-    xRotation: function (ry, rz) {
-        const c = Math.cos(ry * Math.PI / 180)
-        const s = Math.sin(rz * Math.PI / 180)
+    xRotation: function (angle) {
+        const c = Math.cos(angle)
+        const s = Math.sin(angle)
         return [
             1, 0, 0, 0,
-            0, c, -s, 0,
-            0, s, c, 0,
+            0, c, s, 0,
+            0, -s, c, 0,
             0, 0, 0, 1
         ]
     },
-    yRotation: function (rx, rz) {
-        const c = Math.cos(rx * Math.PI / 180)
-        const s = Math.sin(rz * Math.PI / 180)
+    yRotation: function (angle) {
+        const c = Math.cos(angle)
+        const s = Math.sin(angle)
         return [
             c, 0, -s, 0,
             0, 1, 0, 0,
@@ -123,12 +123,12 @@ window.m4 = {
             0, 0, 0, 1
         ]
     },
-    zRotation: function (rx, ry) {
-        const c = Math.cos(rx * Math.PI / 180)
-        const s = Math.sin(ry * Math.PI / 180)
+    zRotation: function (angle) {
+        const c = Math.cos(angle)
+        const s = Math.sin(angle)
         return [
-            c, -s, 0, 0,
-            s, c, 0, 0,
+            c, s, 0, 0,
+            -s, c, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1
         ]
@@ -194,19 +194,38 @@ window.m4 = {
             b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33
         ]
     },
-    translate: function(m, w, h, d) {
-        return m4.multiply(m, m4.translation(w, h, d))
+    translate: function(m, tx, ty, tz) {
+        return m4.multiply(m, m4.translation(tx, ty, tz))
     },
-    xRotate: function(m, ry, rz) {
-        return m4.multiply(m, m4.xRotation(ry, rz))
+    xRotate: function(m, r) {
+        return m4.multiply(m, m4.xRotation(r))
     },
-    yRotate: function(m, rx, rz) {
-        return m4.multiply(m, m4.yRotation(rx, rz))
+    yRotate: function(m, r) {
+        return m4.multiply(m, m4.yRotation(r))
     },
-    zRotate: function(m, rx, ry) {
-        return m4.multiply(m, m4.zRotation(rx, ry))
+    zRotate: function(m, r) {
+        return m4.multiply(m, m4.zRotation(r))
     },
     scale: function(m, sx, sy, sz) {
         return m4.multiply(m, m4.scaling(sx, sy, sz))
+    },
+    makeZToWMatrix: function(fudgeFactor) {
+        return [
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, fudgeFactor,
+            0, 0, 0, 1,
+        ]
+    },
+    perspective: function(fieldOfViewInRadians, aspect, near, far) {
+        const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians)
+        const rangeInv = 1.0 / (near - far)
+
+        return [
+            f / aspect, 0, 0, 0,
+            0, f, 0, 0,
+            0, 0, (near + far) * rangeInv, -1,
+            0, 0, near * far * rangeInv * 2, 0
+        ]
     }
 }
